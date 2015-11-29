@@ -5,7 +5,7 @@ var Command = require('./Command.js');
 
 function CommandManager() {
 
-    var commands = ['get', 'set'];
+    var commands = ['get', 'set', 'del'];
 
 
     function parseTextCommand(text) {

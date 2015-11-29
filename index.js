@@ -14,9 +14,11 @@ wss.on('connection', function connection(ws) {
         try {
             var command = commandManager.createCommand(memoryDbEngine, message);
             var result = commandManager.run(command);
+            console.log('result: ' + result);
             ws.send(result);
         } catch(e) {
-            ws.send(e);
+            console.log('error: ' + e);
+            ws.send(e.message);
         }
     });
 });
