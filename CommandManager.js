@@ -7,7 +7,7 @@ var Command = require('./Command.js');
 function CommandManager() {
 
     var commands = [
-        'get', 'set', 'del', 'expire', 'ttl',
+        'get', 'set', 'del', 'expire', 'ttl', 'type', 'keys',
         'append', 'strlen', 'incrby',
         'hset', 'hget', 'hkeys', 'hvals', 'hdel', 'hincrby'
     ];

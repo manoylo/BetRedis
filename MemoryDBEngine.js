@@ -59,6 +59,41 @@ function MemoryDBEngine() {
     };
 
 
+    this.type = function (key) {
+        if (!data[key]) {
+            return "none";
+        }
+        if (typeof data[key] == "object") {
+            return "hash";
+        }
+        return "string";
+    };
+
+
+    this.keys = function (keyPattern) {
+        // Allowed patterns examples:
+        // h?llo matches hello, hallo and hxllo
+        // h*llo matches hllo and heeeello
+        // h[ae]llo matches hello and hallo, but not hillo
+        // h[^e]llo matches hallo, hbllo, ... but not hello
+        // h[a-b]llo matches hallo and hbllo
+
+        // replacing key patterns to regexps
+        var PATTERNS_TO_REGEXP = {
+            "\\?": ".",
+            "\\*": ".*"
+        };
+        _.each(PATTERNS_TO_REGEXP, function (regexpLiteral, patternLiteral) {
+            keyPattern = keyPattern.replace(new RegExp(patternLiteral, "g"), regexpLiteral);
+        });
+
+        // matching keys using regexp
+        return _.filter(_.keys(data), function (key) {
+            return key.match(new RegExp("^" + keyPattern + "$"));
+        });
+    };
+
+
     this.append = function (key, value) {
         value = String(value);
 
