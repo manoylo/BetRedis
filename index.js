@@ -15,7 +15,7 @@ wss.on('connection', function connection(ws) {
             var command = commandManager.createCommand(memoryDbEngine, message);
             var result = commandManager.run(command);
             console.log('result: ' + result);
-            ws.send(result);
+            ws.send(String(result));
         } catch(e) {
             console.log('error: ' + e);
             ws.send(e.message);

@@ -5,7 +5,7 @@ var Command = require('./Command.js');
 
 function CommandManager() {
 
-    var commands = ['get', 'set', 'del'];
+    var commands = ['get', 'set', 'del', 'expire', 'ttl'];
 
 
     function parseTextCommand(text) {
@@ -34,6 +34,15 @@ function CommandManager() {
                 if (!commandData['value']) {
                     throw new Error('Syntax error: Missing value for a SET command');
                 }
+                break;
+            case 'expire':
+                if (!commandData['value']) {
+                    throw new Error('Syntax error: Missing value for a EXPIRE command');
+                }
+                if (isNaN(parseInt(commandData['value']))) {
+                    throw new Error('Syntax error: EXPIRE value should be an integer');
+                }
+                break;
         }
     }
 
