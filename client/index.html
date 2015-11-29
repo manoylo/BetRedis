@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
+    <script type="application/javascript" src="myredis.js"></script>
 </head>
 <body>
 
-<p>Please use console...</p>
+<p>Please use the console...</p>
+
 
 <script type="application/javascript">
-    var s = new WebSocket("ws://localhost:3000");
-
-    s.onmessage = function(event) {
-        console.log(event.data);
-    };
+    var myRedis = new MyRedis('localhost:3000');
+    myRedis.set('test:1:string','hello world!');
 </script>
 
 </body>

@@ -34,12 +34,16 @@ function MemoryDBEngine() {
         if (expired[key]) {
             delete expired[key];
         }
-        return 1;
+        return 'OK';
     };
 
 
     this.del = function (key) {
-        delete data[key];
+        if(data[key]) {
+            delete data[key];
+            return 1;
+        }
+        return 0;
     };
 
 

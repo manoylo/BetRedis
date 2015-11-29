@@ -6,7 +6,7 @@ var Command = require('./Command.js');
 
 function CommandManager() {
 
-    var commands = [
+    var COMMANDS = [
         'get', 'set', 'del', 'expire', 'ttl', 'type', 'keys',
         'append', 'strlen', 'incrby',
         'hset', 'hget', 'hkeys', 'hvals', 'hdel', 'hincrby'
@@ -20,7 +20,7 @@ function CommandManager() {
 
         var tokens = text.split(" ");
 
-        if (!_.includes(commands, tokens[0])) {
+        if (!_.includes(COMMANDS, tokens[0])) {
             throw new Error('Unknown command.');
         }
 
