@@ -22,6 +22,9 @@ function MemoryDBEngine() {
 
 
     this.get = function (key) {
+        if(typeof data[key] == "object") {
+            throw new Error("Wrong data type");
+        }
         return data[key];
     };
 
@@ -88,6 +91,26 @@ function MemoryDBEngine() {
         }
         data[key] = parseInt(data[key]) + value;
         return data[key];
+    };
+
+
+    this.hset = function(key, hashKey, values) {
+        var value = _.first(values);
+        if(data[key] && typeof data[key] == "object") {
+            data[key][hashKey] = value;
+            return 0;
+        }
+        data[key] = {};
+        data[key][hashKey] = value;
+        return 1;
+    };
+
+
+    this.hget = function(key, hashKey) {
+        if(!data[key] || !data[key][hashKey]) {
+            return null;
+        }
+        return data[key][hashKey];
     };
 
 

@@ -1,11 +1,16 @@
 "use strict";
 
+var _ = require('lodash');
 var Command = require('./Command.js');
 
 
 function CommandManager() {
 
-    var commands = ['get', 'set', 'del', 'expire', 'ttl', 'append', 'strlen', 'incrby'];
+    var commands = [
+        'get', 'set', 'del', 'expire', 'ttl',
+        'append', 'strlen', 'incrby',
+        'hset', 'hget'
+    ];
 
 
     function parseTextCommand(text) {
@@ -13,17 +18,21 @@ function CommandManager() {
             throw new Error('Empty command');
         }
 
-        var commandsCSV = commands.join('|');
-        var matches = text.match(new RegExp("(" + commandsCSV + ") (\\w+)( (\\w*))?", "i"));
+        var tokens = text.split(" ");
 
-        if (!matches) {
-            throw new Error('Command parse error. Please refer to the correct syntax.');
+        if (!_.includes(commands, tokens[0])) {
+            throw new Error('Unknown command.');
+        }
+
+        if (tokens.length == 1) {
+            throw new Error('Missing a KEY.');
         }
 
         return {
-            type: matches[1],
-            key: matches[2],
-            value: matches[4]
+            type: tokens[0],
+            key: tokens[1],
+            value: tokens[2],
+            otherValues: tokens.slice(3)
         }
     }
 
@@ -31,29 +40,31 @@ function CommandManager() {
     function validateCommandData(commandData) {
         switch (commandData['type']) {
             case 'set':
-                if (!commandData['value']) {
-                    throw new Error('Syntax error: Missing value for a SET command');
-                }
-                break;
             case 'append':
                 if (!commandData['value']) {
-                    throw new Error('Syntax error: Missing value for a APPEND command');
+                    throw new Error('Syntax error: Missing value');
                 }
                 break;
             case 'expire':
-                if (!commandData['value']) {
-                    throw new Error('Syntax error: Missing value for a EXPIRE command');
-                }
-                if (isNaN(parseInt(commandData['value']))) {
-                    throw new Error('Syntax error: EXPIRE value should be an integer');
-                }
-                break;
             case 'incrby':
                 if (!commandData['value']) {
-                    throw new Error('Syntax error: Missing value for a INCRBY command');
+                    throw new Error('Syntax error: Missing value');
                 }
                 if (isNaN(parseInt(commandData['value']))) {
-                    throw new Error('Syntax error: INCRBY value should be an integer');
+                    throw new Error('Syntax error: value should be an integer');
+                }
+                break;
+            case 'hset':
+                if (!commandData['value']) {
+                    throw new Error('Syntax error: Missing Hash key');
+                }
+                if (commandData['otherValues'].length < 1) {
+                    throw new Error('Syntax error: Missing value');
+                }
+                break;
+            case 'hget':
+                if (!commandData['value']) {
+                    throw new Error('Syntax error: Missing Hash key');
                 }
                 break;
         }
@@ -63,7 +74,7 @@ function CommandManager() {
     this.createCommand = function (engine, text) {
         var commandData = parseTextCommand(text);
         validateCommandData(commandData);
-        return new Command(engine, commandData['type'], commandData['key'], commandData['value']);
+        return new Command(engine, commandData['type'], commandData['key'], commandData['value'], commandData['otherValues']);
     };
 
 

@@ -18,7 +18,7 @@ wss.on('connection', function connection(ws) {
             ws.send(String(result));
         } catch(e) {
             console.log('error: ' + e);
-            ws.send(e.message);
+            ws.send("Error: " + e.message);
         }
     });
 });
