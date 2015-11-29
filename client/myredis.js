@@ -5,18 +5,33 @@ var MyRedis = (function () {
         'hset', 'hget', 'hkeys', 'hvals', 'hdel', 'hincrby'
     ];
 
+    var ID_PATTERN = /^ID:\w{12} /;
+
     var connectPromise;
+    var promises = {};
+
+    function generateRequestId() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < 12; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    }
 
     function MyRedis(url) {
         var s = new WebSocket("ws://" + url);
 
-        connectPromise = new Promise(function(resolve, reject) {
-            s.onopen = function() {
+        connectPromise = new Promise(function (resolve, reject) {
+            s.onopen = function () {
                 resolve();
             };
 
-            s.onerror = function(error) {
-                reject(error);
+            s.onclose = function (event) {
+                if (!event.wasClean) {
+                    reject(Error('Connection closed'));
+                }
             };
         });
 
@@ -25,32 +40,18 @@ var MyRedis = (function () {
         //};
 
         this.set = function (key, value) {
-            connectPromise.then(function() {
-                s.send('set ' + key + ' ' + value);
+            var requestId = generateRequestId();
+            connectPromise.then(function () {
+                s.send('ID:' + requestId + ' set ' + key + ' ' + value);
             });
-            //return new Promise(function(resolve, reject) {
-            //    req.onload = function() {
-            //        // This is called even on 404 etc
-            //        // so check the status
-            //        if (req.status == 200) {
-            //            // Resolve the promise with the response text
-            //            resolve(req.response);
-            //        }
-            //        else {
-            //            // Otherwise reject with the status text
-            //            // which will hopefully be a meaningful error
-            //            reject(Error(req.statusText));
-            //        }
-            //    };
-            //
-            //    // Handle network errors
-            //    req.onerror = function() {
-            //        reject(Error("Network Error"));
-            //    };
-            //
-            //    // Make the request
-            //    req.send();
-            //});
+            return new Promise(function(resolve, reject) {
+                s.onmessage = function(event) {
+                    var matches = event['data'].match(ID_PATTERN);
+                    if(matches && matches[0] == 'ID:' + requestId + " ") {
+                        resolve(event['data'].replace(ID_PATTERN, ""));
+                    }
+                }
+            });
         };
     }
 

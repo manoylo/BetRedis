@@ -12,7 +12,9 @@
 
 <script type="application/javascript">
     var myRedis = new MyRedis('localhost:3000');
-    myRedis.set('test:1:string','hello world!');
+    myRedis.set('test:1:string','hello world!').then(function(res) {
+        console.log(res);
+    });
 </script>
 
 </body>
