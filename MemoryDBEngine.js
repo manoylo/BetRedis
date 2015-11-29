@@ -5,7 +5,6 @@ function MemoryDBEngine() {
     var data = {};
 
     this.get = function (key) {
-        console.log('engine: get');
         return data[key];
     };
 

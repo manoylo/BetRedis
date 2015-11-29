@@ -11,8 +11,24 @@ wss.on('connection', function connection(ws) {
     ws.on('message', function incoming(message) {
         console.log('received: %s', message);
 
-        var command = commandManager.createCommand(memoryDbEngine, message);
-        var result = commandManager.run(command);
-        ws.send(result);
+        try {
+            var command = commandManager.createCommand(memoryDbEngine, message);
+            var result = commandManager.run(command);
+            ws.send(result);
+        } catch(e) {
+            ws.send(e);
+        }
     });
 });
+
+//try {
+//    var command = commandManager.createCommand(memoryDbEngine, "set test 123");
+//    var result = commandManager.run(command);
+//    console.log(result);
+//
+//    command = commandManager.createCommand(memoryDbEngine, "get test");
+//    result = commandManager.run(command);
+//    console.log(result);
+//} catch(e) {
+//    console.error(e);
+//}

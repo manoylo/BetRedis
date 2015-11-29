@@ -5,19 +5,35 @@ var Command = require('./Command.js');
 
 function CommandManager() {
 
+    var commands = ['get', 'set'];
+
+
     function parseTextCommand(text) {
+        if (!text) {
+            throw new Error('Empty command');
+        }
+
+        var commandsCSV = commands.join('|');
+        var matches = text.match(new RegExp("(" + commandsCSV + ") (\\w+)( (\\w*))?", "i"));
+
+        if (!matches) {
+            throw new Error('Command parse error. Please refer to the correct syntax.');
+        }
+
         return {
-            type: 'get',
-            key: 'test'
+            type: matches[1],
+            key: matches[2],
+            value: matches[4]
         }
     }
 
 
     function validateCommandData(commandData) {
-        if (commandData['type'] == 'get') {
-            if (!commandData['key']) {
-                throw new Error('Missing key for GET command');
-            }
+        switch (commandData['type']) {
+            case 'set':
+                if (!commandData['value']) {
+                    throw new Error('Syntax error: Missing value for a SET command');
+                }
         }
     }
 
