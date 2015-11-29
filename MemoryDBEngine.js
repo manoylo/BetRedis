@@ -10,8 +10,8 @@ function MemoryDBEngine() {
 
 
     function expireTick() {
-        _.each(expires, function(time, key) {
-            if(time <= 0) {
+        _.each(expires, function (time, key) {
+            if (time <= 0) {
                 delete data[key];
                 delete expires[key];
                 expired[key] = 1;
@@ -22,7 +22,7 @@ function MemoryDBEngine() {
 
 
     this.get = function (key) {
-        if(typeof data[key] == "object") {
+        if (typeof data[key] == "object") {
             throw new Error("Wrong data type");
         }
         return data[key];
@@ -31,7 +31,7 @@ function MemoryDBEngine() {
 
     this.set = function (key, value) {
         data[key] = value;
-        if(expired[key]) {
+        if (expired[key]) {
             delete expired[key];
         }
         return 1;
@@ -49,20 +49,20 @@ function MemoryDBEngine() {
 
 
     this.ttl = function (key) {
-        if(expires[key]) {
+        if (expires[key]) {
             return expires[key];
         }
-        if(expired[key]) {
+        if (expired[key]) {
             return -2;
         }
         return -1;
     };
 
 
-    this.append = function(key, value) {
+    this.append = function (key, value) {
         value = String(value);
 
-        if(data[key]) {
+        if (data[key]) {
             data[key] += value;
         } else {
             data[key] = value;
@@ -71,22 +71,22 @@ function MemoryDBEngine() {
     };
 
 
-    this.strlen = function(key) {
-        if(data[key]) {
+    this.strlen = function (key) {
+        if (data[key]) {
             return String(data[key]).length;
         }
         return 0;
     };
 
 
-    this.incrby = function(key, value) {
+    this.incrby = function (key, value) {
         value = parseInt(value);
 
-        if(!data[key]) {
+        if (!data[key]) {
             data[key] = value;
             return value;
         }
-        if(isNaN(parseInt(data[key]))) {
+        if (isNaN(parseInt(data[key]))) {
             throw new Error("Invalid value for INCRBY");
         }
         data[key] = parseInt(data[key]) + value;
@@ -94,9 +94,9 @@ function MemoryDBEngine() {
     };
 
 
-    this.hset = function(key, hashKey, values) {
+    this.hset = function (key, hashKey, values) {
         var value = _.first(values);
-        if(data[key] && typeof data[key] == "object") {
+        if (data[key] && typeof data[key] == "object") {
             data[key][hashKey] = value;
             return 0;
         }
@@ -106,10 +106,54 @@ function MemoryDBEngine() {
     };
 
 
-    this.hget = function(key, hashKey) {
-        if(!data[key] || !data[key][hashKey]) {
+    this.hget = function (key, hashKey) {
+        if (!data[key] || !data[key][hashKey]) {
             return null;
         }
+        return data[key][hashKey];
+    };
+
+
+    this.hkeys = function (key) {
+        if (!data[key] || typeof data[key] != "object") {
+            return null;
+        }
+        return _.keys(data[key]);
+    };
+
+
+    this.hvals = function (key) {
+        if (!data[key] || typeof data[key] != "object") {
+            return null;
+        }
+        return _.values(data[key]);
+    };
+
+
+    this.hdel = function (key, hashKey) {
+        if (!data[key] || !data[key][hashKey]) {
+            return 0;
+        }
+        delete data[key][hashKey];
+        return 1;
+    };
+
+
+    this.hincrby = function (key, hashKey, values) {
+        var value = parseInt(_.first(values));
+
+        if (!data[key]) {
+            data[key] = {};
+            data[key][hashKey] = value;
+            return value;
+        }
+        if (typeof data[key] != "object") {
+            throw new Error("Wrong data type at given key for HINCRBY");
+        }
+        if (isNaN(parseInt(data[key][hashKey]))) {
+            throw new Error("Wrong data type at given hashKey for HINCRBY");
+        }
+        data[key][hashKey] = parseInt(data[key][hashKey]) + value;
         return data[key][hashKey];
     };
 

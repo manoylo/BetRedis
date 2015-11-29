@@ -9,7 +9,7 @@ function CommandManager() {
     var commands = [
         'get', 'set', 'del', 'expire', 'ttl',
         'append', 'strlen', 'incrby',
-        'hset', 'hget'
+        'hset', 'hget', 'hkeys', 'hvals', 'hdel', 'hincrby'
     ];
 
 
@@ -63,8 +63,20 @@ function CommandManager() {
                 }
                 break;
             case 'hget':
+            case 'hdel':
                 if (!commandData['value']) {
                     throw new Error('Syntax error: Missing Hash key');
+                }
+                break;
+            case 'hincrby':
+                if (!commandData['value']) {
+                    throw new Error('Syntax error: Missing Hash key');
+                }
+                if (commandData['otherValues'].length < 1) {
+                    throw new Error('Syntax error: Missing value');
+                }
+                if (isNaN(parseInt(commandData['otherValues'][0]))) {
+                    throw new Error('Syntax error: value should be an integer');
                 }
                 break;
         }
