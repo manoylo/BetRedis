@@ -25,6 +25,7 @@ function MemoryDBEngine() {
         return data[key];
     };
 
+
     this.set = function (key, value) {
         data[key] = value;
         if(expired[key]) {
@@ -33,13 +34,16 @@ function MemoryDBEngine() {
         return 1;
     };
 
+
     this.del = function (key) {
         delete data[key];
     };
 
+
     this.expire = function (key, value) {
         expires[key] = value;
     };
+
 
     this.ttl = function (key) {
         if(expires[key]) {
@@ -49,6 +53,41 @@ function MemoryDBEngine() {
             return -2;
         }
         return -1;
+    };
+
+
+    this.append = function(key, value) {
+        value = String(value);
+
+        if(data[key]) {
+            data[key] += value;
+        } else {
+            data[key] = value;
+        }
+        return data[key].length;
+    };
+
+
+    this.strlen = function(key) {
+        if(data[key]) {
+            return String(data[key]).length;
+        }
+        return 0;
+    };
+
+
+    this.incrby = function(key, value) {
+        value = parseInt(value);
+
+        if(!data[key]) {
+            data[key] = value;
+            return value;
+        }
+        if(isNaN(parseInt(data[key]))) {
+            throw new Error("Invalid value for INCRBY");
+        }
+        data[key] = parseInt(data[key]) + value;
+        return data[key];
     };
 
 

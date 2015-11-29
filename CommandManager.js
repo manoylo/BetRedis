@@ -5,7 +5,7 @@ var Command = require('./Command.js');
 
 function CommandManager() {
 
-    var commands = ['get', 'set', 'del', 'expire', 'ttl'];
+    var commands = ['get', 'set', 'del', 'expire', 'ttl', 'append', 'strlen', 'incrby'];
 
 
     function parseTextCommand(text) {
@@ -35,12 +35,25 @@ function CommandManager() {
                     throw new Error('Syntax error: Missing value for a SET command');
                 }
                 break;
+            case 'append':
+                if (!commandData['value']) {
+                    throw new Error('Syntax error: Missing value for a APPEND command');
+                }
+                break;
             case 'expire':
                 if (!commandData['value']) {
                     throw new Error('Syntax error: Missing value for a EXPIRE command');
                 }
                 if (isNaN(parseInt(commandData['value']))) {
                     throw new Error('Syntax error: EXPIRE value should be an integer');
+                }
+                break;
+            case 'incrby':
+                if (!commandData['value']) {
+                    throw new Error('Syntax error: Missing value for a INCRBY command');
+                }
+                if (isNaN(parseInt(commandData['value']))) {
+                    throw new Error('Syntax error: INCRBY value should be an integer');
                 }
                 break;
         }
