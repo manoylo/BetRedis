@@ -18,22 +18,39 @@ function CommandManager() {
             throw new Error('Empty command');
         }
 
-        var tokens = text.split(" ");
+        console.log(text);
+        var matches = text.match(/([a-z]+) "([^"]+)"(.*)/i);
 
-        if (!_.includes(COMMANDS, tokens[0])) {
+        if (!matches) {
+            throw new Error('Syntax error.');
+        }
+
+        if (!_.includes(COMMANDS, matches[1])) {
             throw new Error('Unknown command.');
         }
 
-        if (tokens.length == 1) {
+        if (!matches[2]) {
             throw new Error('Missing a KEY.');
         }
 
-        return {
-            type: tokens[0],
-            key: tokens[1],
-            value: tokens[2],
-            otherValues: tokens.slice(3)
+        var result = {
+            type: matches[1],
+            key: matches[2]
+        };
+
+        if (matches[3]) {
+            var values = matches[3].split('" "').map(function (value) {
+                return value.trim().replace(/"/g, "");
+            });
+            result['value'] = values[0];
+
+            if (values.length > 1) {
+                result['otherValues'] = values.slice(1);
+            }
         }
+
+        console.log(result);
+        return result;
     }
 
 

@@ -1,59 +1,159 @@
 var MyRedis = (function () {
+
+    /*** Constants ***/
+
+    var ID_LENGTH = 12;
+    var ID_PATTERN = new RegExp("^ID:\\w{" + ID_LENGTH + "} ");
     var COMMANDS = [
         'get', 'set', 'del', 'expire', 'ttl', 'type', 'keys',
         'append', 'strlen', 'incrby',
         'hset', 'hget', 'hkeys', 'hvals', 'hdel', 'hincrby'
     ];
 
-    var ID_PATTERN = /^ID:\w{12} /;
+
+    /*** Private properties ***/
+
+
 
     var connectPromise;
-    var promises = {};
+    var socket;
+
+
+    /*** Provate functions ***/
+
+
+
 
     function generateRequestId() {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-        for (var i = 0; i < 12; i++)
+        for (var i = 0; i < ID_LENGTH; i++)
             text += possible.charAt(Math.floor(Math.random() * possible.length));
-
         return text;
     }
 
-    function MyRedis(url) {
-        var s = new WebSocket("ws://" + url);
 
+    function sendCommand(commandtext) {
+        var requestId = generateRequestId();
+        connectPromise.then(function () {
+            socket.send('ID:' + requestId + ' ' + commandtext);
+        });
+
+        return new Promise(function (resolve, reject) {
+            socket.onmessage = function (event) {
+                var matches = event['data'].match(ID_PATTERN);
+                if (matches && matches[0] == 'ID:' + requestId + " ") {
+                    resolve(event['data'].replace(ID_PATTERN, ""));
+                }
+            }
+        });
+    }
+
+    /**
+     * MyRedis
+     * @param url
+     * @constructor
+     */
+    function MyRedis(url) {
+        socket = new WebSocket("ws://" + url);
         connectPromise = new Promise(function (resolve, reject) {
-            s.onopen = function () {
+            socket.onopen = function () {
                 resolve();
             };
 
-            s.onclose = function (event) {
+            socket.onclose = function (event) {
                 if (!event.wasClean) {
                     reject(Error('Connection closed'));
                 }
             };
         });
-
-        //s.onmessage = function (event) {
-        //    console.log(event.data);
-        //};
-
-        this.set = function (key, value) {
-            var requestId = generateRequestId();
-            connectPromise.then(function () {
-                s.send('ID:' + requestId + ' set ' + key + ' ' + value);
-            });
-            return new Promise(function(resolve, reject) {
-                s.onmessage = function(event) {
-                    var matches = event['data'].match(ID_PATTERN);
-                    if(matches && matches[0] == 'ID:' + requestId + " ") {
-                        resolve(event['data'].replace(ID_PATTERN, ""));
-                    }
-                }
-            });
-        };
     }
+
+
+    /**
+     * set
+     * @param key
+     * @param value
+     */
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + '"' + key + '"  "' + value + '"');
+    };
+
+
+    MyRedis.prototype.get = function (key) {
+        return sendCommand('get ' + '"' + key + '"');
+    };
+
+
+    MyRedis.prototype.strlen = function (key) {
+        return sendCommand('strlen ' + '"' + key + '"');
+    };
+
+    /*
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + key + ' ' + value);
+    };
+
+
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + key + ' ' + value);
+    };
+
+
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + key + ' ' + value);
+    };
+
+
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + key + ' ' + value);
+    };
+
+
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + key + ' ' + value);
+    };
+
+
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + key + ' ' + value);
+    };
+
+
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + key + ' ' + value);
+    };
+
+
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + key + ' ' + value);
+    };
+
+
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + key + ' ' + value);
+    };
+
+
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + key + ' ' + value);
+    };
+
+
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + key + ' ' + value);
+    };
+
+
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + key + ' ' + value);
+    };
+
+
+    MyRedis.prototype.set = function (key, value) {
+        return sendCommand('set ' + key + ' ' + value);
+    };
+    */
 
     return MyRedis;
 }());
