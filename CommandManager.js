@@ -18,7 +18,6 @@ function CommandManager() {
             throw new Error('Empty command');
         }
 
-        console.log(text);
         var matches = text.match(/([a-z]+) "([^"]+)"(.*)/i);
 
         if (!matches) {
@@ -48,8 +47,6 @@ function CommandManager() {
                 result['otherValues'] = values.slice(1);
             }
         }
-
-        console.log(result);
         return result;
     }
 
