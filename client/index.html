@@ -20,9 +20,40 @@
         return myRedis.strlen('test:1:string');
     }).then(function (res) {
         console.log(res);
-    }).catch(function(err) {
+    }).catch(function (err) {
         console.log(err);
     });
+
+
+    function testExpire() {
+        myRedis.set('expireKey', 'hello!').then(function (res) {
+            console.log(res);
+            return myRedis.expire('expireKey', 5);
+        }).then(function (res) {
+            console.log(res);
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+        setTimeout(function () {
+            myRedis.ttl('expireKey').then(function (res) {
+                console.log('first ttl: ' + res);
+            }).catch(function (err) {
+                console.log(err);
+            });
+        }, 3000);
+
+        setTimeout(function () {
+            myRedis.ttl('expireKey').then(function (res) {
+                console.log('second ttl: ' + res);
+            }).catch(function (err) {
+                console.log(err);
+            });
+        }, 6000);
+    }
+
+
+
 
     //  var s = new WebSocket("ws://localhost:3000");
 </script>

@@ -33,10 +33,15 @@ var MyRedis = (function () {
     }
 
 
-    function sendCommand(commandtext) {
+    function sendCommand(commandType, commandArguments) {
+        var commandText = commandType;
+        commandArguments.forEach(function(argument) {
+            commandText += ' "' + argument + '"';
+        });
+
         var requestId = generateRequestId();
         connectPromise.then(function () {
-            socket.send('ID:' + requestId + ' ' + commandtext);
+            socket.send('ID:' + requestId + ' ' + commandText);
         });
 
         return new Promise(function (resolve, reject) {
@@ -76,84 +81,33 @@ var MyRedis = (function () {
      * @param value
      */
     MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + '"' + key + '"  "' + value + '"');
+        return sendCommand('set', [key, value]);
     };
 
 
     MyRedis.prototype.get = function (key) {
-        return sendCommand('get ' + '"' + key + '"');
+        return sendCommand('get', [key]);
     };
 
 
     MyRedis.prototype.strlen = function (key) {
-        return sendCommand('strlen ' + '"' + key + '"');
-    };
-
-    /*
-    MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + key + ' ' + value);
+        return sendCommand('strlen', [key]);
     };
 
 
-    MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + key + ' ' + value);
+    MyRedis.prototype.expire = function (key, value) {
+        return sendCommand('expire', [key, value]);
     };
 
 
-    MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + key + ' ' + value);
+    MyRedis.prototype.ttl = function (key) {
+        return sendCommand('ttl', [key]);
     };
 
 
-    MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + key + ' ' + value);
+    MyRedis.prototype.del = function (key) {
+        return sendCommand('del', [key]);
     };
-
-
-    MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + key + ' ' + value);
-    };
-
-
-    MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + key + ' ' + value);
-    };
-
-
-    MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + key + ' ' + value);
-    };
-
-
-    MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + key + ' ' + value);
-    };
-
-
-    MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + key + ' ' + value);
-    };
-
-
-    MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + key + ' ' + value);
-    };
-
-
-    MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + key + ' ' + value);
-    };
-
-
-    MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + key + ' ' + value);
-    };
-
-
-    MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set ' + key + ' ' + value);
-    };
-    */
 
     return MyRedis;
 }());

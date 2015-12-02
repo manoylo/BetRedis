@@ -25,6 +25,9 @@ function MemoryDBEngine() {
         if (typeof data[key] == "object") {
             throw new Error("Wrong data type");
         }
+        if(!data[key]) {
+            return null;
+        }
         return data[key];
     };
 
@@ -49,6 +52,7 @@ function MemoryDBEngine() {
 
     this.expire = function (key, value) {
         expires[key] = value;
+        return 1;
     };
 
 
