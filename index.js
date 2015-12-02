@@ -1,19 +1,28 @@
+"use strict";
+
 var commandManager = require('./CommandManager');
 var memoryDbEngine = require('./MemoryDBEngine');
 
-var WebSocketServer = require('ws').Server;
-var wss = new WebSocketServer({ port: 3000 });
-
+/**
+ * Request ID regex pattern
+ * @type {RegExp}
+ */
 var ID_PATTERN = /^ID:\w{12} /;
 
 
+// initializaing the WebSocket server
+var WebSocketServer = require('ws').Server;
+var wss = new WebSocketServer({port: 3000});
+
+
 /**
- *
+ * getRequestId
+ * Extracts request ID from a message
  * @param message
  */
 function getRequestId(message) {
     var matches = message.match(ID_PATTERN);
-    if(matches) {
+    if (matches) {
         message = message.replace(ID_PATTERN, "");
         var requestId = matches[0];
     } else {
@@ -22,37 +31,22 @@ function getRequestId(message) {
     return requestId;
 }
 
+/**
+ * main
+ */
 
 wss.on('connection', function connection(ws) {
-
-    console.log('connected');
-
     ws.on('message', function incoming(message) {
-        console.log('received: %s', message);
-
         try {
             var requestId = getRequestId(message);
             var command = commandManager.createCommand(memoryDbEngine, message);
             var result = commandManager.run(command);
-            console.log('result: ' + result);
+            // sending the command result
             ws.send(requestId + ' ' + String(result));
-        } catch(e) {
-            console.log('error: ' + e);
-            if(requestId) {
+        } catch (e) {
+            if (requestId) {
                 ws.send(requestId + "- error - " + e.message);
             }
         }
     });
 });
-
-//try {
-//    var command = commandManager.createCommand(memoryDbEngine, "set test 123");
-//    var result = commandManager.run(command);
-//    console.log(result);
-//
-//    command = commandManager.createCommand(memoryDbEngine, "get test");
-//    result = commandManager.run(command);
-//    console.log(result);
-//} catch(e) {
-//    console.error(e);
-//}

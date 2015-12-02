@@ -3,12 +3,30 @@
 var _ = require('lodash');
 
 
+/**
+ * MemoryDBEngine
+ * Implements DB functionality
+ * @constructor
+ */
 function MemoryDBEngine() {
+    /**
+     * Main data store
+     */
     var data = {};
+    /**
+     * Keys that are expiring
+     */
     var expires = {};
+    /**
+     * Expired keys
+     */
     var expired = {};
 
 
+    /**
+     * expireTick
+     * Expiring functionality
+     */
     function expireTick() {
         _.each(expires, function (time, key) {
             if (time <= 0) {
@@ -21,6 +39,11 @@ function MemoryDBEngine() {
     }
 
 
+    /**
+     * get
+     * @param key
+     * @returns {*}
+     */
     this.get = function (key) {
         if (typeof data[key] == "object") {
             throw new Error("Wrong data type");
@@ -32,6 +55,12 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * set
+     * @param key
+     * @param value
+     * @returns {string}
+     */
     this.set = function (key, value) {
         data[key] = value;
         if (expired[key]) {
@@ -41,6 +70,11 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * del
+     * @param key
+     * @returns {number}
+     */
     this.del = function (key) {
         if(data[key]) {
             delete data[key];
@@ -50,12 +84,23 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * expire
+     * @param key
+     * @param value
+     * @returns {number}
+     */
     this.expire = function (key, value) {
         expires[key] = value;
         return 1;
     };
 
 
+    /**
+     * ttl
+     * @param key
+     * @returns {*}
+     */
     this.ttl = function (key) {
         if (expires[key]) {
             return expires[key];
@@ -67,6 +112,11 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * type
+     * @param key
+     * @returns {*}
+     */
     this.type = function (key) {
         if (!data[key]) {
             return "none";
@@ -78,6 +128,11 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * keys
+     * @param keyPattern
+     * @returns {*}
+     */
     this.keys = function (keyPattern) {
         // Allowed patterns examples:
         // h?llo matches hello, hallo and hxllo
@@ -102,6 +157,12 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * append
+     * @param key
+     * @param value
+     * @returns {*}
+     */
     this.append = function (key, value) {
         value = String(value);
 
@@ -114,6 +175,11 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * strlen
+     * @param key
+     * @returns {*}
+     */
     this.strlen = function (key) {
         if (data[key]) {
             return String(data[key]).length;
@@ -122,6 +188,12 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * incrby
+     * @param key
+     * @param value
+     * @returns {*}
+     */
     this.incrby = function (key, value) {
         value = parseInt(value);
 
@@ -137,6 +209,13 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * hset
+     * @param key
+     * @param hashKey
+     * @param values
+     * @returns {number}
+     */
     this.hset = function (key, hashKey, values) {
         var value = _.first(values);
         if (data[key] && typeof data[key] == "object") {
@@ -153,6 +232,12 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * hget
+     * @param key
+     * @param hashKey
+     * @returns {*}
+     */
     this.hget = function (key, hashKey) {
         if (!data[key] || !data[key][hashKey]) {
             return null;
@@ -161,6 +246,11 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * hkeys
+     * @param key
+     * @returns {*}
+     */
     this.hkeys = function (key) {
         if (!data[key] || typeof data[key] != "object") {
             return null;
@@ -169,6 +259,11 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * hvals
+     * @param key
+     * @returns {*}
+     */
     this.hvals = function (key) {
         if (!data[key] || typeof data[key] != "object") {
             return null;
@@ -177,6 +272,12 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * hdel
+     * @param key
+     * @param hashKey
+     * @returns {number}
+     */
     this.hdel = function (key, hashKey) {
         if (!data[key] || !data[key][hashKey]) {
             return 0;
@@ -186,6 +287,13 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * hincrby
+     * @param key
+     * @param hashKey
+     * @param values
+     * @returns {*}
+     */
     this.hincrby = function (key, hashKey, values) {
         var value = parseInt(_.first(values));
 
@@ -204,7 +312,7 @@ function MemoryDBEngine() {
         return data[key][hashKey];
     };
 
-
+    // starting expiring mechanism
     setInterval(expireTick, 1000);
 }
 

@@ -4,8 +4,17 @@ var _ = require('lodash');
 var Command = require('./Command.js');
 
 
+/**
+ * CommandManager
+ * Responsible for creating and executing Commands
+ * Another name: Invoker
+ * @constructor
+ */
 function CommandManager() {
 
+    /**
+     * Implemented commands
+     */
     var COMMANDS = [
         'get', 'set', 'del', 'expire', 'ttl', 'type', 'keys',
         'append', 'strlen', 'incrby',
@@ -13,11 +22,18 @@ function CommandManager() {
     ];
 
 
+    /**
+     * parseTextCommand
+     * Splits command text into arguments
+     * @param text
+     * @returns {{type: string, key: string}}
+     */
     function parseTextCommand(text) {
         if (!text) {
             throw new Error('Empty command');
         }
 
+        // command regex
         var matches = text.match(/([a-z]+) "([^"]+)"(.*)/i);
 
         if (!matches) {
@@ -37,6 +53,7 @@ function CommandManager() {
             key: matches[2]
         };
 
+        // checking for values
         if (matches[3]) {
             var values = matches[3].split('" "').map(function (value) {
                 return value.trim().replace(/"/g, "");
@@ -51,6 +68,11 @@ function CommandManager() {
     }
 
 
+    /**
+     * validateCommandData
+     * Checks commands syntax: arguments number and type
+     * @param commandData
+     */
     function validateCommandData(commandData) {
         switch (commandData['type']) {
             case 'set':
@@ -97,6 +119,13 @@ function CommandManager() {
     }
 
 
+    /**
+     * createCommand
+     * Command factory method
+     * @param engine
+     * @param text
+     * @returns {Command}
+     */
     this.createCommand = function (engine, text) {
         var commandData = parseTextCommand(text);
         validateCommandData(commandData);
@@ -104,6 +133,11 @@ function CommandManager() {
     };
 
 
+    /**
+     * run
+     * Runs a Command
+     * @param command
+     */
     this.run = function (command) {
         return command.execute();
     };
