@@ -140,8 +140,12 @@ function MemoryDBEngine() {
     this.hset = function (key, hashKey, values) {
         var value = _.first(values);
         if (data[key] && typeof data[key] == "object") {
+            var returnValue = 1;
+            if(data[key][hashKey]) {
+                returnValue = 0;
+            }
             data[key][hashKey] = value;
-            return 0;
+            return returnValue;
         }
         data[key] = {};
         data[key][hashKey] = value;

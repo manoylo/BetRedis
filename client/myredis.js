@@ -35,9 +35,9 @@ var MyRedis = (function () {
 
     function sendCommand(commandType, commandArguments) {
         var commandText = commandType;
-        commandArguments.forEach(function(argument) {
-            commandText += ' "' + argument + '"';
-        });
+        for (var i = 0; i < commandArguments.length; i++) {
+            commandText += ' "' + commandArguments[i] + '"';
+        }
 
         var requestId = generateRequestId();
         connectPromise.then(function () {
@@ -81,32 +81,82 @@ var MyRedis = (function () {
      * @param value
      */
     MyRedis.prototype.set = function (key, value) {
-        return sendCommand('set', [key, value]);
+        return sendCommand('set', arguments);
     };
 
 
     MyRedis.prototype.get = function (key) {
-        return sendCommand('get', [key]);
+        return sendCommand('get', arguments);
     };
 
 
     MyRedis.prototype.strlen = function (key) {
-        return sendCommand('strlen', [key]);
+        return sendCommand('strlen', arguments);
     };
 
 
     MyRedis.prototype.expire = function (key, value) {
-        return sendCommand('expire', [key, value]);
+        return sendCommand('expire', arguments);
     };
 
 
     MyRedis.prototype.ttl = function (key) {
-        return sendCommand('ttl', [key]);
+        return sendCommand('ttl', arguments);
     };
 
 
     MyRedis.prototype.del = function (key) {
-        return sendCommand('del', [key]);
+        return sendCommand('del', arguments);
+    };
+
+
+    MyRedis.prototype.type = function (key) {
+        return sendCommand('type', arguments);
+    };
+
+
+    MyRedis.prototype.keys = function (keyPattern) {
+        return sendCommand('keys', arguments);
+    };
+
+
+    MyRedis.prototype.append = function (key, value) {
+        return sendCommand('append', arguments);
+    };
+
+
+    MyRedis.prototype.incrby = function (key, value) {
+        return sendCommand('incrby', arguments);
+    };
+
+
+    MyRedis.prototype.hset = function (key, hashKey, value) {
+        return sendCommand('hset', arguments);
+    };
+
+
+    MyRedis.prototype.hget = function (key, hashKey) {
+        return sendCommand('hget', arguments);
+    };
+
+
+    MyRedis.prototype.hkeys = function (key) {
+        return sendCommand('hkeys', arguments);
+    };
+
+
+    MyRedis.prototype.hvals = function (key) {
+        return sendCommand('hvals', arguments);
+    };
+
+
+    MyRedis.prototype.hdel = function (key, hashKey) {
+        return sendCommand('hdel', arguments);
+    };
+
+
+    MyRedis.prototype.hincrby = function (key, hashKey, value) {
+        return sendCommand('hincrby', arguments);
     };
 
     return MyRedis;

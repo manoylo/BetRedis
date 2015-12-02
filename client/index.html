@@ -20,9 +20,51 @@
         return myRedis.strlen('test:1:string');
     }).then(function (res) {
         console.log(res);
+        return myRedis.del('test:1:string');
+    }).then(function (res) {
+        console.log(res);
+        return myRedis.get('test:1:string');
+    }).then(function (res) {
+        console.log(res);
     }).catch(function (err) {
         console.log(err);
     });
+
+
+    function secondTest() {
+        myRedis.set('test1', '100').then(function (res) {
+            console.log(res);
+            return myRedis.set('test2', 'test2:string');
+        }).then(function (res) {
+            console.log(res);
+            return myRedis.set('test', 'a random string');
+        }).then(function (res) {
+            console.log(res);
+            return myRedis.type('test');
+        }).then(function (res) {
+            console.log(res);
+            return myRedis.keys('test[0-9]');
+        }).then(function (res) {
+            console.log(res);
+            return myRedis.del('test');
+        }).then(function (res) {
+            console.log(res);
+            return myRedis.get('test');
+        }).then(function (res) {
+            console.log(res);
+            return myRedis.append('test2', ':suffix');
+        }).then(function (res) {
+            console.log(res);
+            return myRedis.get('test2');
+        }).then(function (res) {
+            console.log(res);
+            return myRedis.incrby('test1', 100);
+        }).then(function (res) {
+            console.log(res);
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
 
 
     function testExpire() {
@@ -53,6 +95,31 @@
     }
 
 
+    function hashesTest() {
+        myRedis.hset('user', 'name', 'John').then(function (res) {
+            console.log(res);
+            return myRedis.hset('user', 'balance', 1000);
+        }).then(function (res) {
+            console.log(res);
+            return myRedis.hkeys('user');
+        }).then(function (res) {
+            console.log(res);
+            return myRedis.hvals('user');
+        }).then(function (res) {
+            console.log(res);
+            return myRedis.hincrby('user', 'balance', 2000);
+        }).then(function (res) {
+            console.log(res);
+            return myRedis.hdel('user', 'name');
+        }).then(function (res) {
+            console.log(res);
+            return myRedis.hkeys('user');
+        }).then(function (res) {
+            console.log(res);
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
 
 
     //  var s = new WebSocket("ws://localhost:3000");
