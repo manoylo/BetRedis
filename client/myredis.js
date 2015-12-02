@@ -48,7 +48,13 @@ var MyRedis = (function () {
             socket.onmessage = function (event) {
                 var matches = event['data'].match(ID_PATTERN);
                 if (matches && matches[0] == 'ID:' + requestId + " ") {
-                    resolve(event['data'].replace(ID_PATTERN, ""));
+                    var message = event['data'].replace(ID_PATTERN, "");
+                    var matchesError = message.match(/- error - (.*)/);
+                    if (matchesError) {
+                        reject(matchesError[1]);
+                    } else {
+                        resolve(message);
+                    }
                 }
             }
         });

@@ -6,6 +6,23 @@ var wss = new WebSocketServer({ port: 3000 });
 
 var ID_PATTERN = /^ID:\w{12} /;
 
+
+/**
+ *
+ * @param message
+ */
+function getRequestId(message) {
+    var matches = message.match(ID_PATTERN);
+    if(matches) {
+        message = message.replace(ID_PATTERN, "");
+        var requestId = matches[0];
+    } else {
+        throw new Error('Invalid message format - ID is missing');
+    }
+    return requestId;
+}
+
+
 wss.on('connection', function connection(ws) {
 
     console.log('connected');
@@ -14,21 +31,16 @@ wss.on('connection', function connection(ws) {
         console.log('received: %s', message);
 
         try {
-            var matches = message.match(ID_PATTERN);
-            if(matches) {
-                message = message.replace(ID_PATTERN, "");
-                var requestId = matches[0];
-                console.log(requestId);
-            } else {
-                throw new Error('Invalid message format - ID is missing');
-            }
+            var requestId = getRequestId(message);
             var command = commandManager.createCommand(memoryDbEngine, message);
             var result = commandManager.run(command);
             console.log('result: ' + result);
             ws.send(requestId + ' ' + String(result));
         } catch(e) {
             console.log('error: ' + e);
-            ws.send("Error: " + e.message);
+            if(requestId) {
+                ws.send(requestId + "- error - " + e.message);
+            }
         }
     });
 });
