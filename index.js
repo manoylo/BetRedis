@@ -1,6 +1,7 @@
 "use strict";
 
 var commandManager = require('./CommandManager');
+var pubSubManager = require('./PubSubManager');
 var memoryDbEngine = require('./MemoryDBEngine');
 
 /**
@@ -36,11 +37,15 @@ function getRequestId(message) {
  */
 
 wss.on('connection', function connection(ws) {
+    pubSubManager.addConnection(ws);
+
+    // message received
     ws.on('message', function incoming(message) {
         try {
             var requestId = getRequestId(message);
             var command = commandManager.createCommand(memoryDbEngine, message);
             var result = commandManager.run(command);
+
             // sending the command result
             ws.send(requestId + ' ' + String(result));
         } catch (e) {
@@ -49,4 +54,13 @@ wss.on('connection', function connection(ws) {
             }
         }
     });
+
+    ws.on('close', function () {
+        pubSubManager.removeConnection(ws);
+    });
+
+    ws.on('error', function () {
+        pubSubManager.removeConnection(ws);
+    });
+
 });
