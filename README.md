@@ -18,5 +18,14 @@ node index.js
 client/index.html
 
 
+Note additional test functions:
+
+secondTest();
+
+testExpire();
+
+hashesTest();
+
+
 ####Cats add-on
 cats/index.js
