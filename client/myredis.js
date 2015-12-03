@@ -61,6 +61,8 @@ var MyRedis = (function () {
                     } else {
                         resolve(message);
                     }
+                } else {
+                    console.log(event['data']);
                 }
             }
         });
@@ -256,12 +258,34 @@ var MyRedis = (function () {
     };
 
 
+    /**
+     * subscribe
+     * @param key
+     * @returns {Promise}
+     */
     MyRedis.prototype.subscribe = function (key) {
         return sendCommand('subscribe', arguments);
     };
 
+
+    /**
+     * unsubscribe
+     * @param key
+     * @returns {Promise}
+     */
     MyRedis.prototype.unsubscribe = function (key) {
         return sendCommand('unsubscribe', arguments);
+    };
+
+
+    /**
+     * publish
+     * @param key
+     * @param value
+     * @returns {Promise}
+     */
+    MyRedis.prototype.publish = function (key, value) {
+        return sendCommand('publish', arguments);
     };
 
     return MyRedis;

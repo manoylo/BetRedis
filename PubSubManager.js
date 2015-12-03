@@ -5,7 +5,10 @@ var uuid = require('node-uuid');
 var PubSubCommand = require('./PubSubCommand');
 var CommandManager = require('./CommandManager');
 
-
+/**
+ * Used to store all connections
+ * @type {{}}
+ */
 var connections = {};
 
 
@@ -21,19 +24,35 @@ function PubSubManager() {
     this.COMMANDS = ['publish', 'subscribe', 'unsubscribe'];
 }
 
+// inheriting PubSubManager -> CommandManager
 PubSubManager.prototype = Object.create(CommandManager.prototype);
 
 
+/**
+ * isPubSubCommand
+ * @param commandText
+ * @returns {boolean}
+ */
 PubSubManager.prototype.isPubSubCommand = function (commandText) {
     return commandText.match(new RegExp("^(" + this.COMMANDS.join('|') + ")\\s")) != null;
 };
 
+/**
+ * addConnection
+ * @param connection
+ * @returns {string}
+ */
 PubSubManager.prototype.addConnection = function (connection) {
     var id = uuid.v4();
     connections[id] = connection;
     return id;
 };
 
+
+/**
+ * removeConnection
+ * @param connectionId
+ */
 PubSubManager.prototype.removeConnection = function (connectionId) {
     delete connections[connectionId];
 };
@@ -76,9 +95,21 @@ PubSubManager.prototype.createCommand = function (engine, text, connectionId) {
  */
 PubSubManager.prototype.run = function (command) {
     var result = command.execute();
+
     if (command.type == 'publish') {
-        console.log('publish!!!');
+        if (result['connectionIds']) {
+            _.each(result['connectionIds'], function (connectionId) {
+                if (connections[connectionId]) {
+                    connections[connectionId].send('message');
+                    connections[connectionId].send(result['key']);
+                    connections[connectionId].send(result['value']);
+                }
+            });
+            return result['connectionIds'].length;
+        }
+        return 0;
     }
+
     return result;
 };
 

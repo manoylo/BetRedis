@@ -18,6 +18,10 @@ function Command(dbEngine, type, key, value, otherValues) {
     this.otherValues = otherValues;
 }
 
+/**
+ * execute
+ * @returns {*}
+ */
 Command.prototype.execute = function () {
     return this.dbEngine[this.type].call(null, this.key, this.value, this.otherValues);
 };

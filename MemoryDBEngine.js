@@ -317,6 +317,12 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * subscribe
+     * @param connectionId
+     * @param key
+     * @returns {number}
+     */
     this.subscribe = function (connectionId, key) {
         if (!subscribes[key]) {
             subscribes[key] = [];
@@ -326,6 +332,12 @@ function MemoryDBEngine() {
     };
 
 
+    /**
+     * unsubscribe
+     * @param connectionId
+     * @param key
+     * @returns {number}
+     */
     this.unsubscribe = function (connectionId, key) {
         if (subscribes[key]) {
             subscribes[key] = _.without(subscribes[key], connectionId);
@@ -334,9 +346,21 @@ function MemoryDBEngine() {
     };
 
 
-    this.publish = function (key) {
-        return subscribes[key];
+    /**
+     * publish
+     * @param connectionId
+     * @param key
+     * @param value
+     * @returns {{key: *, value: *, connectionIds: *}}
+     */
+    this.publish = function (connectionId, key, value) {
+        return {
+            key: key,
+            value: value,
+            connectionIds: subscribes[key]
+        };
     };
+
 
     // starting expiring mechanism
     setInterval(expireTick, 1000);

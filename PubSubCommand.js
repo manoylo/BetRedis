@@ -4,7 +4,7 @@ var Command = require('./Command.js');
 
 
 /**
- *
+ * PubSubCommand
  * @param connectionId
  * @param dbEngine
  * @param type
@@ -18,9 +18,14 @@ function PubSubCommand(connectionId, dbEngine, type, key, value, otherValues) {
     this.connectionId = connectionId;
 }
 
+// inheriting PubSubManager -> CommandManager
 PubSubCommand.prototype = Object.create(Command.prototype);
 
 
+/**
+ * execute
+ * @returns {*}
+ */
 PubSubCommand.prototype.execute = function () {
     return this.dbEngine[this.type].call(null, this.connectionId, this.key, this.value, this.otherValues);
 };
