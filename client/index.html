@@ -12,23 +12,24 @@
 
 <script type="application/javascript">
     var myRedis = new MyRedis('localhost:3000');
-    myRedis.set('test:1:string', 'hello world!').then(function (res) {
-        console.log(res);
-        return myRedis.get('test:1:string');
-    }).then(function (res) {
-        console.log(res);
-        return myRedis.strlen('test:1:string');
-    }).then(function (res) {
-        console.log(res);
-        return myRedis.del('test:1:string');
-    }).then(function (res) {
-        console.log(res);
-        return myRedis.get('test:1:string');
-    }).then(function (res) {
-        console.log(res);
-    }).catch(function (err) {
-        console.log(err);
-    });
+
+    //    myRedis.set('test:1:string', 'hello world!').then(function (res) {
+    //        console.log(res);
+    //        return myRedis.get('test:1:string');
+    //    }).then(function (res) {
+    //        console.log(res);
+    //        return myRedis.strlen('test:1:string');
+    //    }).then(function (res) {
+    //        console.log(res);
+    //        return myRedis.del('test:1:string');
+    //    }).then(function (res) {
+    //        console.log(res);
+    //        return myRedis.get('test:1:string');
+    //    }).then(function (res) {
+    //        console.log(res);
+    //    }).catch(function (err) {
+    //        console.log(err);
+    //    });
 
 
     function secondTest() {
@@ -120,6 +121,20 @@
             console.log(err);
         });
     }
+
+    function pubsub() {
+        myRedis.subscribe('test').then(function (res) {
+            console.log(res);
+            return myRedis.unsubscribe('test');
+        }).then(function (res) {
+            console.log(res);
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
+
+    pubsub();
+
 </script>
 
 </body>

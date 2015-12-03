@@ -5,23 +5,20 @@ var Command = require('./Command.js');
 
 
 /**
- * Implemented commands
- */
-var COMMANDS = [
-    'get', 'set', 'del', 'expire', 'ttl', 'type', 'keys',
-    'append', 'strlen', 'incrby',
-    'hset', 'hget', 'hkeys', 'hvals', 'hdel', 'hincrby'
-];
-
-
-/**
  * CommandManager
  * Responsible for creating and executing Commands
  * Another name: Invoker
  * @constructor
  */
 function CommandManager() {
-
+    /**
+     * Implemented commands
+     */
+    this.COMMANDS = [
+        'get', 'set', 'del', 'expire', 'ttl', 'type', 'keys',
+        'append', 'strlen', 'incrby',
+        'hset', 'hget', 'hkeys', 'hvals', 'hdel', 'hincrby'
+    ];
 }
 
 
@@ -43,7 +40,7 @@ CommandManager.prototype.parseTextCommand = function (text) {
         throw new Error('Syntax error.');
     }
 
-    if (!_.includes(COMMANDS, matches[1])) {
+    if (!_.includes(this.COMMANDS, matches[1])) {
         throw new Error('Unknown command.');
     }
 

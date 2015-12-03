@@ -2,11 +2,8 @@
 
 var _ = require('lodash');
 var uuid = require('node-uuid');
-var Command = require('./Command');
+var PubSubCommand = require('./PubSubCommand');
 var CommandManager = require('./CommandManager');
-
-
-var COMMANDS = ['publish', 'subscribe', 'unsubscribe'];
 
 
 var connections = {};
@@ -18,13 +15,17 @@ var connections = {};
  * @constructor
  */
 function PubSubManager() {
+    /**
+     * Implemented commands
+     */
+    this.COMMANDS = ['publish', 'subscribe', 'unsubscribe'];
 }
 
 PubSubManager.prototype = Object.create(CommandManager.prototype);
 
 
 PubSubManager.prototype.isPubSubCommand = function (commandText) {
-    return commandText.match(new RegExp("^(" + COMMANDS.join('|') + ")\\s")) != null;
+    return commandText.match(new RegExp("^(" + this.COMMANDS.join('|') + ")\\s")) != null;
 };
 
 PubSubManager.prototype.addConnection = function (connection) {
@@ -58,13 +59,13 @@ PubSubManager.prototype.validateCommandData = function (commandData) {
  * createCommand
  * @param engine
  * @param text
- * @param connection
- * @returns {Command}
+ * @param connectionId
+ * @returns {PubSubCommand}
  */
-PubSubManager.prototype.createCommand = function (engine, text, connection) {
+PubSubManager.prototype.createCommand = function (engine, text, connectionId) {
     var commandData = this.parseTextCommand(text);
     this.validateCommandData(commandData);
-    return new Command(engine, commandData['type'], commandData['key'], commandData['value'], clientId);
+    return new PubSubCommand(connectionId, engine, commandData['type'], commandData['key'], commandData['value'], commandData['otherValues']);
 };
 
 

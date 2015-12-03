@@ -317,18 +317,18 @@ function MemoryDBEngine() {
     };
 
 
-    this.subscribe = function (key, clientId) {
+    this.subscribe = function (connectionId, key) {
         if (!subscribes[key]) {
             subscribes[key] = [];
         }
-        subscribes[key].push(clientId);
+        subscribes[key].push(connectionId);
         return 1;
     };
 
 
-    this.unsubscribe = function (key, clientId) {
+    this.unsubscribe = function (connectionId, key) {
         if (subscribes[key]) {
-            subscribes[key] = _.without(subscribes[key], clientId);
+            subscribes[key] = _.without(subscribes[key], connectionId);
         }
         return 0;
     };

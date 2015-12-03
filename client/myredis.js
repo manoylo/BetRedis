@@ -255,5 +255,14 @@ var MyRedis = (function () {
         return sendCommand('hincrby', arguments);
     };
 
+
+    MyRedis.prototype.subscribe = function (key) {
+        return sendCommand('subscribe', arguments);
+    };
+
+    MyRedis.prototype.unsubscribe = function (key) {
+        return sendCommand('unsubscribe', arguments);
+    };
+
     return MyRedis;
 }());

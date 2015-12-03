@@ -27,7 +27,6 @@ var wss = new WebSocketServer({port: 3000});
 function getRequestId(message) {
     var matches = message.match(ID_PATTERN);
     if (matches) {
-        message = message.replace(ID_PATTERN, "");
         var requestId = matches[0];
     } else {
         throw new Error('Invalid message format - ID is missing');
@@ -47,6 +46,7 @@ wss.on('connection', function connection(ws) {
         try {
             var command, result;
             var requestId = getRequestId(message);
+            message = message.replace(requestId, "").trim();
 
             if(pubSubManager.isPubSubCommand(message)) {
                 command = pubSubManager.createCommand(memoryDbEngine, message, connectionId);
