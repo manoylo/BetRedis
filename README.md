@@ -26,6 +26,12 @@ testExpire();
 
 hashesTest();
 
+subscribe();
+
+unsubscribe();
+
+publish();
+
 
 ####Cats add-on
 cats/index.js
