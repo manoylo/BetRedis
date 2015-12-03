@@ -1,7 +1,10 @@
 "use strict";
 
-var commandManager = require('./CommandManager');
-var pubSubManager = require('./PubSubManager');
+var CommandManager = require('./CommandManager');
+var PubSubManager = require('./PubSubManager');
+
+var commandManager = new CommandManager();
+var pubSubManager = new PubSubManager();
 var memoryDbEngine = require('./MemoryDBEngine');
 
 /**
@@ -37,14 +40,21 @@ function getRequestId(message) {
  */
 
 wss.on('connection', function connection(ws) {
-    pubSubManager.addConnection(ws);
+    var connectionId = pubSubManager.addConnection(ws);
 
     // message received
     ws.on('message', function incoming(message) {
         try {
+            var command, result;
             var requestId = getRequestId(message);
-            var command = commandManager.createCommand(memoryDbEngine, message);
-            var result = commandManager.run(command);
+
+            if(pubSubManager.isPubSubCommand(message)) {
+                command = pubSubManager.createCommand(memoryDbEngine, message, connectionId);
+                result = pubSubManager.run(command);
+            } else {
+                command = commandManager.createCommand(memoryDbEngine, message);
+                result = commandManager.run(command);
+            }
 
             // sending the command result
             ws.send(requestId + ' ' + String(result));
@@ -56,11 +66,11 @@ wss.on('connection', function connection(ws) {
     });
 
     ws.on('close', function () {
-        pubSubManager.removeConnection(ws);
+        pubSubManager.removeConnection(connectionId);
     });
 
     ws.on('error', function () {
-        pubSubManager.removeConnection(ws);
+        pubSubManager.removeConnection(connectionId);
     });
 
 });

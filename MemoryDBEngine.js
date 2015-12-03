@@ -21,6 +21,10 @@ function MemoryDBEngine() {
      * Expired keys
      */
     var expired = {};
+    /**
+     * Subscribes
+     */
+    var subscribes = {};
 
 
     /**
@@ -48,7 +52,7 @@ function MemoryDBEngine() {
         if (typeof data[key] == "object") {
             throw new Error("Wrong data type");
         }
-        if(!data[key]) {
+        if (!data[key]) {
             return null;
         }
         return data[key];
@@ -76,7 +80,7 @@ function MemoryDBEngine() {
      * @returns {number}
      */
     this.del = function (key) {
-        if(data[key]) {
+        if (data[key]) {
             delete data[key];
             return 1;
         }
@@ -220,7 +224,7 @@ function MemoryDBEngine() {
         var value = _.first(values);
         if (data[key] && typeof data[key] == "object") {
             var returnValue = 1;
-            if(data[key][hashKey]) {
+            if (data[key][hashKey]) {
                 returnValue = 0;
             }
             data[key][hashKey] = value;
@@ -310,6 +314,28 @@ function MemoryDBEngine() {
         }
         data[key][hashKey] = parseInt(data[key][hashKey]) + value;
         return data[key][hashKey];
+    };
+
+
+    this.subscribe = function (key, clientId) {
+        if (!subscribes[key]) {
+            subscribes[key] = [];
+        }
+        subscribes[key].push(clientId);
+        return 1;
+    };
+
+
+    this.unsubscribe = function (key, clientId) {
+        if (subscribes[key]) {
+            subscribes[key] = _.without(subscribes[key], clientId);
+        }
+        return 0;
+    };
+
+
+    this.publish = function (key) {
+        return subscribes[key];
     };
 
     // starting expiring mechanism

@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "lodash": "~3.10.1",
+    "node-uuid": "^1.4.7",
     "ws": "~0.8.1"
   },
   "repository": {
